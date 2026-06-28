@@ -5,8 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <title>VAKHRANDI CMS</title>
+    <script>window.CMS_MANUAL_INIT = true</script>
   </head>
   <body>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.3.3/dist/decap-cms.js"></script>
+    <script>
+      fetch('/admin/config.yml')
+        .then(function(r) {
+          if (!r.ok) throw new Error('config.yml returned ' + r.status)
+          return r.text()
+        })
+        .then(function(yaml) {
+          var config = jsyaml.load(yaml)
+          config.local_backend = window.location.hostname === 'localhost'
+          CMS.init({ config: config })
+        })
+        .catch(function(err) {
+          document.body.innerHTML =
+            '<p style="padding:2rem;font-family:sans-serif;color:red">CMS failed to load: ' + err.message + '</p>'
+        })
+    </script>
   </body>
 </html>
