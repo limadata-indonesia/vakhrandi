@@ -1,9 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro'
-import { getCollection } from 'astro:content'
+import { client, urlFor } from '../../lib/sanity'
 
-const merchRaw = await getCollection('merch')
-const merch = merchRaw.sort((a, b) => a.data.order - b.data.order)
+const merch = await client.fetch(`*[_type == "merch"] | order(order asc)`)
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
@@ -29,46 +28,43 @@ const categories = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD', 'Vinyl']
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-      {merch.map(({ id, data }) => {
-        const slug = id.replace(/\.md$/, '')
-        return (
-          <a
-            href={`/merch/${slug}`}
-            data-category={data.category}
-            class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-          >
-            <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-5xl border-b border-gray-100 relative">
-              {data.image
-                ? <img src={data.image} alt={data.name} class="w-full h-full object-cover" />
-                : data.emoji
-              }
-              {data.stock === 'Sold Out' && (
-                <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
-                  <span class="text-xs font-black text-[#6B6475] uppercase tracking-widest">Sold Out</span>
-                </div>
-              )}
-              {data.stock === 'Low Stock' && (
-                <div class="absolute top-2 right-2">
-                  <span class="text-[10px] font-bold bg-[#FEF3C7] text-[#D97706] px-2 py-0.5 rounded-full">Low Stock</span>
-                </div>
-              )}
-            </div>
-            <div class="p-4">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A]">{data.category}</span>
-              <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug group-hover:text-[#C4A35A] transition-colors">{data.name}</h3>
-              {data.sizes && (
-                <div class="flex flex-wrap gap-1 mb-2">
-                  {data.sizes.map(s => <span class="text-[10px] text-[#6B6475] border border-gray-200 px-1.5 py-0.5 rounded">{s}</span>)}
-                </div>
-              )}
-              <div class="flex items-center justify-between mt-2">
-                <span class="font-black text-[#0D0C0E] text-sm">{fmt(data.price)}</span>
-                <span class="text-xs text-[#C4A35A] font-bold">View →</span>
+      {merch.map((item: any) => (
+        <a
+          href={`/merch/${item.slug?.current}`}
+          data-category={item.category}
+          class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+        >
+          <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-5xl border-b border-gray-100 relative">
+            {item.image
+              ? <img src={urlFor(item.image).width(400).url()} alt={item.name} class="w-full h-full object-cover" />
+              : item.emoji
+            }
+            {item.stock === 'Sold Out' && (
+              <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
+                <span class="text-xs font-black text-[#6B6475] uppercase tracking-widest">Sold Out</span>
               </div>
+            )}
+            {item.stock === 'Low Stock' && (
+              <div class="absolute top-2 right-2">
+                <span class="text-[10px] font-bold bg-[#FEF3C7] text-[#D97706] px-2 py-0.5 rounded-full">Low Stock</span>
+              </div>
+            )}
+          </div>
+          <div class="p-4">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A]">{item.category}</span>
+            <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug group-hover:text-[#C4A35A] transition-colors">{item.name}</h3>
+            {item.sizes?.length > 0 && (
+              <div class="flex flex-wrap gap-1 mb-2">
+                {item.sizes.map((s: string) => <span class="text-[10px] text-[#6B6475] border border-gray-200 px-1.5 py-0.5 rounded">{s}</span>)}
+              </div>
+            )}
+            <div class="flex items-center justify-between mt-2">
+              <span class="font-black text-[#0D0C0E] text-sm">{fmt(item.price)}</span>
+              <span class="text-xs text-[#C4A35A] font-bold">View →</span>
             </div>
-          </a>
-        )
-      })}
+          </div>
+        </a>
+      ))}
     </div>
 
   </div>

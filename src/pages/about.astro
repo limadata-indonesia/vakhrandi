@@ -1,9 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import { getCollection } from 'astro:content'
+import { client } from '../lib/sanity'
 
-const settingsEntries = await getCollection('settings')
-const artist = settingsEntries[0].data
+const artist = await client.fetch(`*[_type == "artist"][0]`)
 ---
 
 <Layout title={`About — ${artist.name}`} description={artist.bio}>

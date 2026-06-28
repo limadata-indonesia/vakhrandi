@@ -1,18 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import { getCollection } from 'astro:content'
+import { client, urlFor } from '../lib/sanity'
 
-const [settingsEntries, releasesRaw] = await Promise.all([
-  getCollection('settings'),
-  getCollection('releases'),
+const [artist, releases] = await Promise.all([
+  client.fetch(`*[_type == "artist"][0]`),
+  client.fetch(`*[_type == "release"] | order(order asc)`),
 ])
 
-const artist = settingsEntries[0].data
-const releases = releasesRaw.sort((a, b) => a.data.order - b.data.order)
-const latest = releases[0]
+const latest = releases?.[0]
 ---
 
-<Layout title={`${artist.name} — Official Site`} description={artist.bio}>
+<Layout title={`${artist?.name ?? 'VAKHRANDI'} — Official Site`} description={artist?.bio ?? ''}>
 
   <!-- ── HERO ── -->
   <section class="min-h-[90vh] flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
@@ -21,12 +19,12 @@ const latest = releases[0]
 
     <div class="relative z-10 max-w-3xl mx-auto">
       <div class="w-32 h-32 rounded-full bg-[#E8E4DE] mx-auto mb-8 flex items-center justify-center overflow-hidden border-4 border-white shadow-xl">
-        <span class="text-3xl text-[#6B6475] font-black">{artist.name[0]}</span>
+        <span class="text-3xl text-[#6B6475] font-black">{artist?.name?.[0] ?? 'V'}</span>
       </div>
 
       <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-4">Official Website</p>
-      <h1 class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-[#0D0C0E] mb-4">{artist.name}</h1>
-      <p class="text-lg text-[#6B6475] mb-10 font-medium">{artist.tagline}</p>
+      <h1 class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-[#0D0C0E] mb-4">{artist?.name ?? 'VAKHRANDI'}</h1>
+      <p class="text-lg text-[#6B6475] mb-10 font-medium">{artist?.tagline}</p>
 
       <div class="flex flex-wrap gap-3 justify-center">
         <a href="/listen" class="inline-flex items-center gap-2 bg-[#0D0C0E] text-white text-sm font-bold px-7 py-3.5 rounded-full hover:bg-[#C4A35A] transition-colors">
@@ -48,25 +46,27 @@ const latest = releases[0]
   </section>
 
   <!-- ── STATS ── -->
-  <section class="border-y border-gray-100 py-12 bg-white">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="grid grid-cols-3 divide-x divide-gray-100">
-        {Object.entries(artist.stats).map(([key, value]) => {
-          const labels: Record<string, string> = {
-            monthlyListeners: 'Monthly Listeners',
-            totalStreams:     'Total Streams',
-            totalReleases:    'Total Releases',
-          }
-          return (
-            <div class="text-center px-6">
-              <div class="text-3xl md:text-4xl font-black text-[#0D0C0E] mb-1">{value}</div>
-              <div class="text-xs text-[#6B6475] uppercase tracking-widest font-medium">{labels[key] ?? key}</div>
-            </div>
-          )
-        })}
+  {artist?.stats && (
+    <section class="border-y border-gray-100 py-12 bg-white">
+      <div class="max-w-4xl mx-auto px-6">
+        <div class="grid grid-cols-3 divide-x divide-gray-100">
+          {Object.entries(artist.stats as Record<string, string>).map(([key, value]) => {
+            const labels: Record<string, string> = {
+              monthlyListeners: 'Monthly Listeners',
+              totalStreams:     'Total Streams',
+              totalReleases:    'Total Releases',
+            }
+            return (
+              <div class="text-center px-6">
+                <div class="text-3xl md:text-4xl font-black text-[#0D0C0E] mb-1">{value}</div>
+                <div class="text-xs text-[#6B6475] uppercase tracking-widest font-medium">{labels[key] ?? key}</div>
+              </div>
+            )
+          })}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
   <!-- ── LATEST RELEASE ── -->
   {latest && (
@@ -77,18 +77,18 @@ const latest = releases[0]
 
         <div class="flex flex-col md:flex-row items-center gap-12">
           <div class="flex-shrink-0 w-64 h-64 bg-[#E8E4DE] rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
-            {latest.data.cover && latest.data.cover !== '/images/placeholder-release.jpg'
-              ? <img src={latest.data.cover} alt={latest.data.title} class="w-full h-full object-cover" />
+            {latest.cover
+              ? <img src={urlFor(latest.cover).width(512).url()} alt={latest.title} class="w-full h-full object-cover" />
               : <span class="text-5xl">🎵</span>
             }
           </div>
           <div>
             <p class="text-xs text-[#6B6475] uppercase tracking-widest font-medium mb-2">
-              {latest.data.type} · {latest.data.year}
+              {latest.type} · {latest.year}
             </p>
-            <h3 class="text-4xl font-black text-[#0D0C0E] mb-8">{latest.data.title}</h3>
+            <h3 class="text-4xl font-black text-[#0D0C0E] mb-8">{latest.title}</h3>
             <div class="flex flex-wrap gap-3">
-              {latest.data.links.map(({ platform, url }) => (
+              {latest.links?.map(({ platform, url }: { platform: string; url: string }) => (
                 <a
                   href={url}
                   class="inline-flex items-center gap-2 border border-gray-200 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-[#0D0C0E] hover:text-white hover:border-[#0D0C0E] transition-all"

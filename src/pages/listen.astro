@@ -1,10 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { client } from '../lib/sanity'
 
-// Replace these with real Spotify/Apple Music embed IDs
-const spotifyTrackId   = ''  // e.g. '4cOdK2wGLETKBW3PvgPWqT'
-const spotifyPlaylistId = '' // e.g. '37i9dQZF1DXcBWIGoYBM5M'
-const appleMusicId      = '' // e.g. '1234567890'
+const artist = await client.fetch(
+  `*[_type == "artist"][0]{ spotifyTrackId, spotifyPlaylistId, appleMusicId }`
+)
+const spotifyTrackId    = artist?.spotifyTrackId    ?? ''
+const spotifyPlaylistId = artist?.spotifyPlaylistId ?? ''
+const appleMusicId      = artist?.appleMusicId      ?? ''
 ---
 
 <Layout title="Listen — VAKHRANDI" description="Stream VAKHRANDI on Spotify and Apple Music.">
