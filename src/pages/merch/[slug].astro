@@ -2,13 +2,6 @@
 import Layout from '../../layouts/Layout.astro'
 import { client, urlFor } from '../../lib/sanity'
 
-export async function getStaticPaths() {
-  const items = await client.fetch(`*[_type == "merch" && defined(slug.current)]{ slug }`)
-  return items.map((item: any) => ({
-    params: { slug: item.slug.current },
-  }))
-}
-
 const { slug } = Astro.params
 const data = await client.fetch(
   `*[_type == "merch" && slug.current == $slug][0]`,
