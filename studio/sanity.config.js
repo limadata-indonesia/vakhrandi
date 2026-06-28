@@ -1,6 +1,5 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
-import { visionTool } from '@sanity/vision'
 import schemas from './schemas/index.js'
 
 export default defineConfig({
@@ -25,7 +24,6 @@ export default defineConfig({
             S.documentTypeListItem('gallery').title('Gallery'),
           ]),
     }),
-    visionTool(),
   ],
   schema: { types: schemas },
 })
