@@ -11,6 +11,18 @@
     <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <script src="https://unpkg.com/decap-cms@3.3.3/dist/decap-cms.js"></script>
     <script>
+      // When GitHub's COOP header nullifies window.opener in the popup,
+      // the callback falls back to BroadcastChannel. We relay it here
+      // as a window message event so Decap CMS receives it normally.
+      try {
+        new BroadcastChannel('decap_cms_auth').addEventListener('message', function(e) {
+          window.dispatchEvent(new MessageEvent('message', {
+            data:   e.data,
+            origin: window.location.origin,
+          }))
+        })
+      } catch(e) {}
+
       fetch('/admin/config.yml')
         .then(function(r) {
           if (!r.ok) throw new Error('config.yml returned ' + r.status)

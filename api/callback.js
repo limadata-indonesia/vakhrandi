@@ -40,8 +40,14 @@ function popupScript(message) {
   return `<!doctype html><html><body><script>
     (function() {
       var msg = ${JSON.stringify(message)};
-      window.opener && window.opener.postMessage(msg, '*');
-      window.close();
+      if (window.opener) {
+        window.opener.postMessage(msg, '*');
+      } else {
+        // GitHub sets COOP:same-origin which nullifies window.opener.
+        // Use BroadcastChannel so the admin page can relay the message.
+        try { new BroadcastChannel('decap_cms_auth').postMessage(msg) } catch(e) {}
+      }
+      setTimeout(function() { window.close() }, 200);
     })();
   \x3c/script></body></html>`
 }
