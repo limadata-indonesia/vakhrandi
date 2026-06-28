@@ -1,72 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro'
-
-type MerchCategory = 'T-Shirt' | 'Hoodie' | 'Cap' | 'Poster' | 'CD' | 'Vinyl'
-
-interface MerchItem {
-  name: string
-  category: MerchCategory
-  price: number
-  sizes?: string[]
-  stock: 'In Stock' | 'Low Stock' | 'Sold Out'
-  marketplace?: string
-  whatsapp?: string
-}
-
-const items: MerchItem[] = [
-  {
-    name: 'VAKHRANDI Classic Tee',
-    category: 'T-Shirt',
-    price: 185000,
-    sizes: ['S','M','L','XL','XXL'],
-    stock: 'In Stock',
-    whatsapp: '#',
-    marketplace: '#',
-  },
-  {
-    name: 'Broken Signals Hoodie',
-    category: 'Hoodie',
-    price: 365000,
-    sizes: ['S','M','L','XL'],
-    stock: 'Low Stock',
-    whatsapp: '#',
-    marketplace: '#',
-  },
-  {
-    name: 'Logo Cap',
-    category: 'Cap',
-    price: 145000,
-    stock: 'In Stock',
-    whatsapp: '#',
-    marketplace: '#',
-  },
-  {
-    name: 'Dusk Circuit Poster (A2)',
-    category: 'Poster',
-    price: 95000,
-    stock: 'In Stock',
-    whatsapp: '#',
-  },
-  {
-    name: 'Dusk Circuit EP — CD',
-    category: 'CD',
-    price: 125000,
-    stock: 'In Stock',
-    whatsapp: '#',
-    marketplace: '#',
-  },
-  {
-    name: 'Dusk Circuit EP — Vinyl',
-    category: 'Vinyl',
-    price: 490000,
-    stock: 'Sold Out',
-    whatsapp: '#',
-  },
-]
+import Layout from '../../layouts/Layout.astro'
+import { merch, fmt, type MerchCategory } from '../../data/merch'
 
 const categories: MerchCategory[] = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD', 'Vinyl']
-
-const fmt = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 ---
 
 <Layout title="Merch — VAKHRANDI" description="Official VAKHRANDI merchandise — tees, hoodies, posters, vinyl, and more.">
@@ -93,14 +29,15 @@ const fmt = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', c
 
     <!-- Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-      {items.map(({ name, category, price, sizes, stock, marketplace, whatsapp }) => (
-        <article
+      {merch.map(({ slug, name, category, price, sizes, stock, emoji }) => (
+        <a
+          href={`/merch/${slug}`}
           data-category={category}
-          class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg transition-all group"
+          class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
         >
-          <!-- Product image placeholder -->
-          <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-4xl border-b border-gray-100 relative">
-            👕
+          <!-- Product image -->
+          <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-5xl border-b border-gray-100 relative">
+            {emoji}
             {stock === 'Sold Out' && (
               <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
                 <span class="text-xs font-black text-[#6B6475] uppercase tracking-widest">Sold Out</span>
@@ -115,7 +52,7 @@ const fmt = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', c
 
           <div class="p-4">
             <span class="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A]">{category}</span>
-            <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug">{name}</h3>
+            <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug group-hover:text-[#C4A35A] transition-colors">{name}</h3>
 
             {sizes && (
               <div class="flex flex-wrap gap-1 mb-2">
@@ -125,22 +62,12 @@ const fmt = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', c
               </div>
             )}
 
-            <div class="font-black text-[#0D0C0E] mb-3">{fmt(price)}</div>
-
-            <div class="flex flex-col gap-1.5">
-              {stock !== 'Sold Out' && whatsapp && (
-                <a href={whatsapp} class="text-center text-xs font-bold bg-[#0D0C0E] text-white py-2 rounded-full hover:bg-[#C4A35A] transition-colors">
-                  WhatsApp Order
-                </a>
-              )}
-              {marketplace && stock !== 'Sold Out' && (
-                <a href={marketplace} class="text-center text-xs font-semibold border border-gray-200 text-[#6B6475] py-2 rounded-full hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">
-                  Marketplace
-                </a>
-              )}
+            <div class="flex items-center justify-between mt-2">
+              <span class="font-black text-[#0D0C0E] text-sm">{fmt(price)}</span>
+              <span class="text-xs text-[#C4A35A] font-bold">View →</span>
             </div>
           </div>
-        </article>
+        </a>
       ))}
     </div>
 
