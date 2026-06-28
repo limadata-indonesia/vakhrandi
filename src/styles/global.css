@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0D0C0E;
+  --ink-muted: #6B6475;
+  --surface: #F9F8F6;
+  --gold: #C4A35A;
+  --gold-light: #EDE0C4;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+::selection { background: var(--gold-light); }

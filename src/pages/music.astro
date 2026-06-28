@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+type ReleaseType = 'Single' | 'EP' | 'Album' | 'Collaboration'
+
+interface Release {
+  title: string
+  type: ReleaseType
+  year: string
+  duration: string
+  description: string
+  links: { label: string; href: string }[]
+}
+
+const releases: Release[] = [
+  {
+    title: 'Broken Signals',
+    type: 'Single',
+    year: '2026',
+    duration: '3:42',
+    description: 'A hazy ambient-electronic track exploring disconnection and digital noise.',
+    links: [
+      { label: 'Spotify',       href: '#' },
+      { label: 'Apple Music',   href: '#' },
+      { label: 'Deezer',        href: '#' },
+      { label: 'YouTube Music', href: '#' },
+      { label: 'Amazon Music',  href: '#' },
+    ],
+  },
+  {
+    title: 'Dusk Circuit',
+    type: 'EP',
+    year: '2025',
+    duration: '18:30',
+    description: 'A 5-track EP journeying through dusk into late-night electronic textures.',
+    links: [
+      { label: 'Spotify',     href: '#' },
+      { label: 'Apple Music', href: '#' },
+      { label: 'Deezer',      href: '#' },
+    ],
+  },
+  {
+    title: 'Still Water',
+    type: 'Collaboration',
+    year: '2024',
+    duration: '4:10',
+    description: 'Collaborative single with ambient producer ARSA — reflective and sparse.',
+    links: [
+      { label: 'Spotify',     href: '#' },
+      { label: 'Apple Music', href: '#' },
+    ],
+  },
+]
+
+const filters: ReleaseType[] = ['Single', 'EP', 'Album', 'Collaboration']
+---
+
+<Layout title="Music — VAKHRANDI" description="Full catalog of VAKHRANDI releases — singles, EPs, albums, and collaborations.">
+
+  <!-- Header -->
+  <section class="py-20 px-6 bg-[#F9F8F6] text-center">
+    <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-3">Discography</p>
+    <h1 class="text-5xl font-black text-[#0D0C0E] mb-4">Music</h1>
+    <p class="text-[#6B6475] max-w-md mx-auto">Every release, every drop — all in one place.</p>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-6 py-16">
+
+    <!-- Filter tabs -->
+    <div class="flex flex-wrap gap-2 mb-12" id="filter-tabs">
+      <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-semibold border border-[#0D0C0E] bg-[#0D0C0E] text-white transition-all">
+        All
+      </button>
+      {filters.map(f => (
+        <button data-filter={f} class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">
+          {f}
+        </button>
+      ))}
+    </div>
+
+    <!-- Releases grid -->
+    <div class="space-y-6" id="releases-list">
+      {releases.map(({ title, type, year, duration, description, links }) => (
+        <article data-type={type} class="release-card flex flex-col sm:flex-row gap-6 p-6 border border-gray-100 rounded-2xl hover:border-gray-300 transition-all bg-white">
+          <!-- Cover art placeholder -->
+          <div class="flex-shrink-0 w-24 h-24 bg-[#E8E4DE] rounded-xl flex items-center justify-center text-2xl">
+            🎵
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-4 flex-wrap mb-1">
+              <h2 class="text-xl font-black text-[#0D0C0E]">{title}</h2>
+              <span class="flex-shrink-0 text-xs font-bold uppercase tracking-widest text-[#C4A35A] bg-[#EDE0C4] px-3 py-1 rounded-full">
+                {type}
+              </span>
+            </div>
+            <p class="text-xs text-[#6B6475] font-medium mb-2">Released {year} · {duration}</p>
+            <p class="text-sm text-[#6B6475] leading-relaxed mb-4">{description}</p>
+            <div class="flex flex-wrap gap-2">
+              {links.map(({ label, href }) => (
+                <a
+                  href={href}
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold border border-gray-200 px-3 py-1.5 rounded-full hover:bg-[#0D0C0E] hover:text-white hover:border-[#0D0C0E] transition-all"
+                >
+                  ▶ {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn')
+  const cards = document.querySelectorAll<HTMLElement>('.release-card')
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter!
+      btns.forEach(b => {
+        b.classList.remove('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]', 'active')
+        b.classList.add('border-gray-200', 'text-[#6B6475]')
+      })
+      btn.classList.add('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]', 'active')
+      btn.classList.remove('border-gray-200', 'text-[#6B6475]')
+
+      cards.forEach(card => {
+        if (filter === 'all' || card.dataset.type === filter) {
+          card.style.display = ''
+        } else {
+          card.style.display = 'none'
+        }
+      })
+    })
+  })
+</script>

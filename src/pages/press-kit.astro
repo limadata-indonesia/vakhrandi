@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const downloads = [
+  { label: 'Official Biography (EN)',       file: '/press/vakhrandi-bio-en.pdf',    icon: '📄' },
+  { label: 'Official Biography (ID)',       file: '/press/vakhrandi-bio-id.pdf',    icon: '📄' },
+  { label: 'High-Res Photos (ZIP)',         file: '/press/vakhrandi-photos.zip',    icon: '🖼' },
+  { label: 'Artist Logo Pack (SVG + PNG)', file: '/press/vakhrandi-logos.zip',     icon: '🎨' },
+  { label: 'Stage Rider',                  file: '/press/vakhrandi-stage-rider.pdf', icon: '🎤' },
+  { label: 'Technical Rider',              file: '/press/vakhrandi-tech-rider.pdf', icon: '🎛' },
+  { label: 'Electronic Press Kit (PDF)',   file: '/press/vakhrandi-epk.pdf',       icon: '📦' },
+]
+---
+
+<Layout title="Press Kit — VAKHRANDI" description="Official VAKHRANDI press kit — biography, photos, logo, stage rider and EPK.">
+
+  <section class="py-20 px-6 bg-[#F9F8F6] text-center">
+    <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-3">For Media & Event Organizers</p>
+    <h1 class="text-5xl font-black text-[#0D0C0E] mb-4">Press Kit</h1>
+    <p class="text-[#6B6475] max-w-md mx-auto">Everything you need to feature or book VAKHRANDI.</p>
+  </section>
+
+  <div class="max-w-4xl mx-auto px-6 py-16 space-y-16">
+
+    <!-- Bio excerpt -->
+    <div class="p-8 border border-gray-100 rounded-2xl bg-white">
+      <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-4">Official Bio</p>
+      <p class="text-[#0D0C0E] leading-relaxed mb-4">
+        VAKHRANDI is an independent music artist creating at the intersection of indie electronic, alternative, and ambient music. Self-produced and genre-fluid, VAKHRANDI's sound is defined by atmospheric textures, introspective lyricism, and meticulous sound design.
+      </p>
+      <p class="text-[#6B6475] leading-relaxed">
+        With releases distributed globally and a growing listener base across streaming platforms, VAKHRANDI continues to build a catalog that challenges genre boundaries while maintaining a distinct, recognizable identity.
+      </p>
+    </div>
+
+    <!-- Downloads -->
+    <div>
+      <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-6">Downloads</p>
+      <div class="space-y-3">
+        {downloads.map(({ label, file, icon }) => (
+          <a
+            href={file}
+            download
+            class="flex items-center gap-4 p-4 border border-gray-100 rounded-xl bg-white hover:border-[#C4A35A] hover:shadow-sm transition-all group"
+          >
+            <span class="text-2xl flex-shrink-0">{icon}</span>
+            <span class="flex-1 font-semibold text-[#0D0C0E] text-sm group-hover:text-[#C4A35A] transition-colors">{label}</span>
+            <span class="text-xs font-bold text-[#6B6475] group-hover:text-[#C4A35A] transition-colors flex-shrink-0">↓ Download</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Contact for media -->
+    <div class="p-8 bg-[#F9F8F6] rounded-2xl border border-gray-100 text-center">
+      <p class="font-black text-[#0D0C0E] text-lg mb-2">Media Inquiries</p>
+      <p class="text-[#6B6475] text-sm mb-6">For interviews, features, and editorial requests:</p>
+      <a href="/contact" class="inline-flex items-center gap-2 bg-[#0D0C0E] text-white font-bold px-7 py-3 rounded-full hover:bg-[#C4A35A] transition-colors text-sm">
+        Get in Touch →
+      </a>
+    </div>
+
+  </div>
+</Layout>

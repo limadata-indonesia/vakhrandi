@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const platforms = [
+  {
+    name: 'Instagram',
+    handle: '@vakhrandi',
+    href: '#',
+    color: 'from-[#833ab4] to-[#fd1d1d]',
+    description: 'Latest posts, stories & reels.',
+    embedNote: 'Add Instagram embed widget or use a social feed API here.',
+  },
+  {
+    name: 'TikTok',
+    handle: '@vakhrandi',
+    href: '#',
+    color: 'from-[#010101] to-[#69C9D0]',
+    description: 'Short-form videos, music clips & behind the scenes.',
+    embedNote: 'Add TikTok embed widget here.',
+  },
+  {
+    name: 'YouTube',
+    handle: 'VAKHRANDI',
+    href: '#',
+    color: 'from-[#FF0000] to-[#cc0000]',
+    description: 'Music videos, lyric videos & live sessions.',
+    embedNote: 'Add YouTube channel RSS or embed here.',
+  },
+  {
+    name: 'Threads',
+    handle: '@vakhrandi',
+    href: '#',
+    color: 'from-[#101010] to-[#333]',
+    description: 'Thoughts, updates & conversations.',
+    embedNote: 'Add Threads embed or link here.',
+  },
+  {
+    name: 'X / Twitter',
+    handle: '@vakhrandi',
+    href: '#',
+    color: 'from-[#000] to-[#222]',
+    description: 'Quick updates and interactions.',
+    embedNote: 'Add Twitter timeline widget here.',
+  },
+  {
+    name: 'Facebook',
+    handle: 'VAKHRANDI',
+    href: '#',
+    color: 'from-[#1877F2] to-[#166FE5]',
+    description: 'Posts, events & fan community.',
+    embedNote: 'Add Facebook Page plugin here.',
+  },
+]
+---
+
+<Layout title="Social Hub — VAKHRANDI" description="Follow VAKHRANDI on all social media platforms.">
+
+  <section class="py-20 px-6 bg-[#F9F8F6] text-center">
+    <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-3">Stay Connected</p>
+    <h1 class="text-5xl font-black text-[#0D0C0E] mb-4">Social Hub</h1>
+    <p class="text-[#6B6475] max-w-md mx-auto">All channels, one place.</p>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-6 py-16">
+
+    <!-- Link Hub -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-20">
+      {platforms.map(({ name, handle, href, color }) => (
+        <a
+          href={href}
+          class={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-br ${color} text-white hover:scale-105 hover:shadow-xl transition-all`}
+        >
+          <span class="text-xs font-black uppercase tracking-widest">{name}</span>
+          <span class="text-[11px] opacity-70">{handle}</span>
+        </a>
+      ))}
+    </div>
+
+    <!-- Platform Feed Cards -->
+    <div class="grid md:grid-cols-2 gap-8">
+      {platforms.map(({ name, handle, href, embedNote }) => (
+        <div class="border border-gray-100 rounded-2xl overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <div>
+              <h2 class="font-black text-[#0D0C0E]">{name}</h2>
+              <span class="text-xs text-[#6B6475]">{handle}</span>
+            </div>
+            <a href={href} class="text-xs font-bold text-[#C4A35A] hover:underline">Follow →</a>
+          </div>
+          <!-- Embed placeholder -->
+          <div class="bg-[#F9F8F6] h-48 flex items-center justify-center px-6">
+            <p class="text-sm text-[#6B6475] text-center">{embedNote}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</Layout>
