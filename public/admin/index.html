@@ -11,9 +11,19 @@
     <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <script src="https://unpkg.com/decap-cms@3.3.3/dist/decap-cms.js"></script>
     <script>
-      // When GitHub's COOP header nullifies window.opener in the popup,
-      // the callback falls back to BroadcastChannel. We relay it here
-      // as a window message event so Decap CMS receives it normally.
+      // GitHub sets COOP:same-origin which nullifies window.opener in the
+      // OAuth popup. Primary fallback: the popup writes to localStorage,
+      // which fires a 'storage' event in all other same-origin windows.
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'decap_cms_auth' && e.newValue) {
+          window.dispatchEvent(new MessageEvent('message', {
+            data:   e.newValue,
+            origin: window.location.origin,
+          }))
+          try { localStorage.removeItem('decap_cms_auth') } catch(ex) {}
+        }
+      })
+      // Secondary fallback: BroadcastChannel (same session, different tab)
       try {
         new BroadcastChannel('decap_cms_auth').addEventListener('message', function(e) {
           window.dispatchEvent(new MessageEvent('message', {

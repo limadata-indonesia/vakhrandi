@@ -41,13 +41,18 @@ function popupScript(message) {
     (function() {
       var msg = ${JSON.stringify(message)};
       if (window.opener) {
+        // Normal flow — opener still available
         window.opener.postMessage(msg, '*');
-      } else {
-        // GitHub sets COOP:same-origin which nullifies window.opener.
-        // Use BroadcastChannel so the admin page can relay the message.
-        try { new BroadcastChannel('decap_cms_auth').postMessage(msg) } catch(e) {}
+        window.close();
+        return;
       }
-      setTimeout(function() { window.close() }, 200);
+      // GitHub sets COOP:same-origin which nullifies window.opener.
+      // localStorage.setItem triggers the 'storage' event in all other
+      // same-origin windows (including the admin tab) — most reliable fallback.
+      try { localStorage.setItem('decap_cms_auth', msg) } catch(e) {}
+      // BroadcastChannel as secondary fallback
+      try { new BroadcastChannel('decap_cms_auth').postMessage(msg) } catch(e) {}
+      window.close();
     })();
   \x3c/script></body></html>`
 }
