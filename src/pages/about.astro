@@ -1,26 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
 
-const milestones = [
-  { year: '2022', event: 'Started producing music independently.' },
-  { year: '2023', event: 'First release on Spotify and Apple Music.' },
-  { year: '2024', event: 'Collaborated with regional artists.' },
-  { year: '2025', event: 'Reached growing streaming milestones.' },
-  { year: '2026', event: 'Released "Broken Signals" — latest single.' },
-]
-
-const influences = ['Bonobo', 'Four Tet', 'Floating Points', 'Jon Hopkins', 'Arca']
-
-const achievements = [
-  'Featured on Spotify editorial playlists',
-  'Collaborated with multiple independent artists',
-  'Growing international listener base',
-]
+const settingsEntries = await getCollection('settings')
+const artist = settingsEntries[0].data
 ---
 
-<Layout title="About — VAKHRANDI" description="Learn about VAKHRANDI — biography, career journey, influences, and achievements.">
+<Layout title={`About — ${artist.name}`} description={artist.bio}>
 
-  <!-- Header -->
   <section class="py-20 px-6 bg-[#F9F8F6] text-center">
     <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-3">The Artist</p>
     <h1 class="text-5xl font-black text-[#0D0C0E] mb-4">About</h1>
@@ -33,58 +20,62 @@ const achievements = [
     <div class="grid md:grid-cols-2 gap-12 items-start">
       <div>
         <div class="w-full aspect-square bg-[#E8E4DE] rounded-2xl flex items-center justify-center text-6xl text-[#6B6475] font-black">
-          V
+          {artist.name[0]}
         </div>
       </div>
       <div>
         <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-4">Biography</p>
-        <p class="text-[#0D0C0E] leading-relaxed mb-4">
-          VAKHRANDI is an independent music artist blending indie electronic, alternative, and ambient soundscapes. With a self-produced approach to music creation, VAKHRANDI crafts immersive sonic experiences that sit between introspection and movement.
-        </p>
-        <p class="text-[#6B6475] leading-relaxed">
-          Drawing from a wide palette of influences — from deep house to post-rock — each release explores new textures and emotional landscapes, building a catalog that grows with every drop.
-        </p>
+        <p class="text-[#0D0C0E] leading-relaxed mb-4">{artist.bio}</p>
+        {artist.bioExtended && (
+          <p class="text-[#6B6475] leading-relaxed">{artist.bioExtended}</p>
+        )}
       </div>
     </div>
 
     <!-- Career Journey -->
-    <div>
-      <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-8">Career Journey</p>
-      <div class="relative pl-6 border-l border-gray-200 space-y-8">
-        {milestones.map(({ year, event }) => (
-          <div class="relative">
-            <div class="absolute -left-[1.625rem] w-3 h-3 rounded-full bg-[#C4A35A] border-2 border-white"></div>
-            <span class="text-xs font-bold text-[#C4A35A] tracking-widest uppercase">{year}</span>
-            <p class="text-[#0D0C0E] font-medium mt-1">{event}</p>
-          </div>
-        ))}
+    {artist.milestones.length > 0 && (
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-8">Career Journey</p>
+        <div class="relative pl-6 border-l border-gray-200 space-y-8">
+          {artist.milestones.map(({ year, event }) => (
+            <div class="relative">
+              <div class="absolute -left-[1.625rem] w-3 h-3 rounded-full bg-[#C4A35A] border-2 border-white"></div>
+              <span class="text-xs font-bold text-[#C4A35A] tracking-widest uppercase">{year}</span>
+              <p class="text-[#0D0C0E] font-medium mt-1">{event}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    )}
 
     <!-- Influences -->
-    <div>
-      <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-6">Musical Influences</p>
-      <div class="flex flex-wrap gap-3">
-        {influences.map(name => (
-          <span class="px-4 py-2 bg-[#F9F8F6] border border-gray-200 rounded-full text-sm font-semibold text-[#0D0C0E]">
-            {name}
-          </span>
-        ))}
+    {artist.influences.length > 0 && (
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-6">Musical Influences</p>
+        <div class="flex flex-wrap gap-3">
+          {artist.influences.map(name => (
+            <span class="px-4 py-2 bg-[#F9F8F6] border border-gray-200 rounded-full text-sm font-semibold text-[#0D0C0E]">
+              {name}
+            </span>
+          ))}
+        </div>
       </div>
-    </div>
+    )}
 
     <!-- Achievements -->
-    <div>
-      <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-6">Achievements</p>
-      <ul class="space-y-3">
-        {achievements.map(item => (
-          <li class="flex items-start gap-3">
-            <span class="text-[#C4A35A] font-bold mt-0.5">✦</span>
-            <span class="text-[#0D0C0E] font-medium">{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    {artist.achievements.length > 0 && (
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-6">Achievements</p>
+        <ul class="space-y-3">
+          {artist.achievements.map(item => (
+            <li class="flex items-start gap-3">
+              <span class="text-[#C4A35A] font-bold mt-0.5">✦</span>
+              <span class="text-[#0D0C0E] font-medium">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
 
   </div>
 </Layout>

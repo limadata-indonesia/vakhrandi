@@ -1,21 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
 
-type GalleryCategory = 'Photoshoot' | 'Live Performance' | 'Behind The Scene' | 'Studio Session' | 'Fan Event'
+const photosRaw = await getCollection('gallery')
+const photos = photosRaw.sort((a, b) => a.data.order - b.data.order)
 
-const categories: GalleryCategory[] = ['Photoshoot', 'Live Performance', 'Behind The Scene', 'Studio Session', 'Fan Event']
-
-// Replace src with real image paths under /public/gallery/
-const photos: { src: string; alt: string; category: GalleryCategory }[] = [
-  { src: '/gallery/photo-1.jpg', alt: 'Photoshoot 1',        category: 'Photoshoot'       },
-  { src: '/gallery/photo-2.jpg', alt: 'Live Performance',    category: 'Live Performance'  },
-  { src: '/gallery/photo-3.jpg', alt: 'Studio Session',      category: 'Studio Session'   },
-  { src: '/gallery/photo-4.jpg', alt: 'Behind The Scene',    category: 'Behind The Scene' },
-  { src: '/gallery/photo-5.jpg', alt: 'Photoshoot 2',        category: 'Photoshoot'       },
-  { src: '/gallery/photo-6.jpg', alt: 'Fan Event',           category: 'Fan Event'        },
-  { src: '/gallery/photo-7.jpg', alt: 'Live Performance 2',  category: 'Live Performance' },
-  { src: '/gallery/photo-8.jpg', alt: 'Studio Session 2',    category: 'Studio Session'   },
-]
+const categories = ['Photoshoot', 'Live Performance', 'Behind The Scene', 'Studio Session', 'Fan Event']
 ---
 
 <Layout title="Gallery — VAKHRANDI" description="Photo gallery — photoshoots, live performances, studio sessions and more.">
@@ -28,48 +18,48 @@ const photos: { src: string; alt: string; category: GalleryCategory }[] = [
 
   <div class="max-w-6xl mx-auto px-6 py-16">
 
-    <!-- Filter -->
     <div class="flex flex-wrap gap-2 mb-10">
-      <button data-filter="all" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-[#0D0C0E] text-white border border-[#0D0C0E] transition-all">
-        All
-      </button>
+      <button data-filter="all" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-[#0D0C0E] text-white border border-[#0D0C0E] transition-all">All</button>
       {categories.map(c => (
-        <button data-filter={c} class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">
-          {c}
-        </button>
+        <button data-filter={c} class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">{c}</button>
       ))}
     </div>
 
-    <!-- Masonry grid -->
-    <div class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4" id="gallery-grid">
-      {photos.map(({ src, alt, category }, i) => (
-        <div
-          data-category={category}
-          class="gallery-item break-inside-avoid mb-4 overflow-hidden rounded-xl bg-[#E8E4DE] cursor-pointer group relative"
-          data-index={i}
-        >
-          <div class={`w-full bg-[#E8E4DE] flex items-center justify-center text-[#6B6475] font-bold text-sm ${i % 3 === 0 ? 'aspect-square' : i % 3 === 1 ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}>
-            Photo {i + 1}
+    {photos.length > 0 ? (
+      <div class="columns-2 md:columns-3 lg:columns-4 gap-4">
+        {photos.map(({ data }, i) => (
+          <div
+            data-category={data.category}
+            class="gallery-item break-inside-avoid mb-4 overflow-hidden rounded-xl bg-[#E8E4DE] cursor-pointer group relative"
+          >
+            {data.src ? (
+              <img src={data.src} alt={data.alt} class={`w-full object-cover ${i % 3 === 0 ? 'aspect-square' : i % 3 === 1 ? 'aspect-[3/4]' : 'aspect-[4/3]'}`} loading="lazy" />
+            ) : (
+              <div class={`w-full bg-[#E8E4DE] flex items-center justify-center text-[#6B6475] font-bold text-sm ${i % 3 === 0 ? 'aspect-square' : i % 3 === 1 ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}>
+                {data.alt}
+              </div>
+            )}
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-end p-3">
+              <span class="text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-3 py-1 rounded-full">
+                {data.category}
+              </span>
+            </div>
           </div>
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
-            <span class="text-white font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-3 py-1.5 rounded-full">
-              {category}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-20 text-[#6B6475]">
+        <p class="text-lg font-semibold mb-2">No photos yet</p>
+        <p class="text-sm">Add photos via the <a href="/admin" class="text-[#C4A35A] underline">CMS</a>.</p>
+      </div>
+    )}
 
   </div>
 
   <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-6">
     <button id="lb-close" class="absolute top-6 right-6 text-white text-3xl font-light hover:text-[#C4A35A] transition-colors">✕</button>
-    <div id="lb-content" class="max-w-3xl w-full max-h-[80vh] flex items-center justify-center">
-      <div class="w-full h-96 bg-[#333] rounded-xl flex items-center justify-center text-white" id="lb-img">
-        Image preview
-      </div>
-    </div>
+    <img id="lb-img" src="" alt="" class="max-w-3xl max-h-[80vh] rounded-xl object-contain" />
   </div>
 </Layout>
 
@@ -77,39 +67,27 @@ const photos: { src: string; alt: string; category: GalleryCategory }[] = [
   const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn')
   const items = document.querySelectorAll<HTMLElement>('.gallery-item')
   const lightbox = document.getElementById('lightbox')!
-  const lbClose = document.getElementById('lb-close')!
+  const lbClose  = document.getElementById('lb-close')!
+  const lbImg    = document.getElementById('lb-img') as HTMLImageElement
 
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter!
-      btns.forEach(b => {
-        b.classList.remove('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]')
-        b.classList.add('border-gray-200', 'text-[#6B6475]')
-      })
-      btn.classList.add('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]')
-      btn.classList.remove('border-gray-200', 'text-[#6B6475]')
-      items.forEach(item => {
-        item.style.display = (filter === 'all' || item.dataset.category === filter) ? '' : 'none'
-      })
+      btns.forEach(b => { b.classList.remove('bg-[#0D0C0E]','text-white','border-[#0D0C0E]'); b.classList.add('border-gray-200','text-[#6B6475]') })
+      btn.classList.add('bg-[#0D0C0E]','text-white','border-[#0D0C0E]'); btn.classList.remove('border-gray-200','text-[#6B6475]')
+      items.forEach(i => { i.style.display = (filter === 'all' || i.dataset.category === filter) ? '' : 'none' })
     })
   })
 
   items.forEach(item => {
     item.addEventListener('click', () => {
-      lightbox.classList.remove('hidden')
-      lightbox.classList.add('flex')
+      const img = item.querySelector('img')
+      if (img) { lbImg.src = img.src; lbImg.alt = img.alt }
+      lightbox.classList.remove('hidden'); lightbox.classList.add('flex')
     })
   })
 
-  lbClose.addEventListener('click', () => {
-    lightbox.classList.add('hidden')
-    lightbox.classList.remove('flex')
-  })
-
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.add('hidden')
-      lightbox.classList.remove('flex')
-    }
-  })
+  const closeLb = () => { lightbox.classList.add('hidden'); lightbox.classList.remove('flex') }
+  lbClose.addEventListener('click', closeLb)
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLb() })
 </script>

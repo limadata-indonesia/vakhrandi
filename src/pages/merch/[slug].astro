@@ -1,46 +1,56 @@
 ---
 import Layout from '../../layouts/Layout.astro'
-import { merch, getMerchBySlug, fmt } from '../../data/merch'
+import { getCollection } from 'astro:content'
 
-export function getStaticPaths() {
-  return merch.map(item => ({ params: { slug: item.slug } }))
+export async function getStaticPaths() {
+  const items = await getCollection('merch')
+  return items.map(item => ({
+    params: { slug: item.id.replace(/\.md$/, '') },
+    props:  { item },
+  }))
 }
 
-const { slug } = Astro.params
-const item = getMerchBySlug(slug)
-if (!item) return Astro.redirect('/merch')
+const { item } = Astro.props
+const { data } = item
+const slug = item.id.replace(/\.md$/, '')
 
-const { name, category, price, sizes, stock, description, details, marketplace, whatsapp, emoji } = item
+const fmt = (n: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
-const related = merch.filter(m => m.slug !== slug && m.category === category).slice(0, 3)
+const allMerch = await getCollection('merch')
+const related = allMerch
+  .filter(m => m.id !== item.id && m.data.category === data.category)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3)
 ---
 
-<Layout title={`${name} — VAKHRANDI Merch`} description={description}>
+<Layout title={`${data.name} — VAKHRANDI Merch`} description={data.description}>
 
-  <!-- Breadcrumb -->
   <div class="max-w-6xl mx-auto px-6 pt-8 pb-2">
     <nav class="text-xs text-[#6B6475] flex items-center gap-1.5">
       <a href="/merch" class="hover:text-[#0D0C0E] transition-colors">Merch</a>
       <span>›</span>
-      <span class="text-[#C4A35A] font-semibold">{category}</span>
+      <span class="text-[#C4A35A] font-semibold">{data.category}</span>
       <span>›</span>
-      <span class="text-[#0D0C0E] font-semibold truncate">{name}</span>
+      <span class="text-[#0D0C0E] font-semibold truncate">{data.name}</span>
     </nav>
   </div>
 
-  <!-- Product -->
   <div class="max-w-6xl mx-auto px-6 py-10">
     <div class="grid md:grid-cols-2 gap-12 items-start">
 
       <!-- Image -->
-      <div class="aspect-square bg-[#F9F8F6] rounded-2xl border border-gray-100 flex items-center justify-center text-8xl sticky top-24 relative overflow-hidden">
-        {emoji}
-        {stock === 'Sold Out' && (
+      <div class="aspect-square bg-[#F9F8F6] rounded-2xl border border-gray-100 flex items-center justify-center sticky top-24 relative overflow-hidden">
+        {data.image
+          ? <img src={data.image} alt={data.name} class="w-full h-full object-cover" />
+          : <span class="text-8xl">{data.emoji}</span>
+        }
+        {data.stock === 'Sold Out' && (
           <div class="absolute inset-0 bg-white/60 flex items-center justify-center">
             <span class="text-sm font-black text-[#6B6475] uppercase tracking-widest border border-[#6B6475] px-4 py-2 rounded-full">Sold Out</span>
           </div>
         )}
-        {stock === 'Low Stock' && (
+        {data.stock === 'Low Stock' && (
           <div class="absolute top-4 right-4">
             <span class="text-xs font-bold bg-[#FEF3C7] text-[#D97706] px-3 py-1 rounded-full">Low Stock</span>
           </div>
@@ -50,17 +60,16 @@ const related = merch.filter(m => m.slug !== slug && m.category === category).sl
       <!-- Info -->
       <div class="space-y-6">
         <div>
-          <span class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A]">{category}</span>
-          <h1 class="text-3xl font-black text-[#0D0C0E] mt-1 mb-3 leading-tight">{name}</h1>
-          <div class="text-2xl font-black text-[#0D0C0E]">{fmt(price)}</div>
+          <span class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A]">{data.category}</span>
+          <h1 class="text-3xl font-black text-[#0D0C0E] mt-1 mb-3 leading-tight">{data.name}</h1>
+          <div class="text-2xl font-black text-[#0D0C0E]">{fmt(data.price)}</div>
         </div>
 
-        <!-- Sizes -->
-        {sizes && sizes.length > 0 && (
+        {data.sizes && data.sizes.length > 0 && (
           <div>
             <label class="block text-xs font-bold uppercase tracking-widest text-[#6B6475] mb-3">Size</label>
-            <div class="flex flex-wrap gap-2" id="size-selector">
-              {sizes.map((s, i) => (
+            <div class="flex flex-wrap gap-2">
+              {data.sizes.map((s, i) => (
                 <button
                   data-size={s}
                   class={`size-btn w-12 h-12 rounded-xl border-2 text-sm font-bold transition-all ${i === 0 ? 'border-[#0D0C0E] bg-[#0D0C0E] text-white' : 'border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E]'}`}
@@ -72,12 +81,10 @@ const related = merch.filter(m => m.slug !== slug && m.category === category).sl
           </div>
         )}
 
-        <!-- Description -->
-        <p class="text-[#6B6475] leading-relaxed text-sm">{description}</p>
+        <p class="text-[#6B6475] leading-relaxed text-sm">{data.description}</p>
 
-        <!-- Details -->
         <ul class="space-y-2">
-          {details.map(d => (
+          {data.details.map(d => (
             <li class="flex items-start gap-2.5 text-sm">
               <span class="text-[#C4A35A] font-bold mt-0.5 flex-shrink-0">✦</span>
               <span class="text-[#0D0C0E]">{d}</span>
@@ -85,23 +92,16 @@ const related = merch.filter(m => m.slug !== slug && m.category === category).sl
           ))}
         </ul>
 
-        <!-- CTAs -->
         <div class="flex flex-col gap-3 pt-2">
-          {stock !== 'Sold Out' ? (
+          {data.stock !== 'Sold Out' ? (
             <>
-              {whatsapp && (
-                <a
-                  href={whatsapp}
-                  class="flex items-center justify-center gap-2 bg-[#0D0C0E] text-white font-black py-4 rounded-full hover:bg-[#C4A35A] transition-colors text-sm"
-                >
+              {data.whatsapp && (
+                <a href={data.whatsapp} class="flex items-center justify-center gap-2 bg-[#0D0C0E] text-white font-black py-4 rounded-full hover:bg-[#C4A35A] transition-colors text-sm">
                   WhatsApp Order →
                 </a>
               )}
-              {marketplace && (
-                <a
-                  href={marketplace}
-                  class="flex items-center justify-center gap-2 border-2 border-gray-200 text-[#0D0C0E] font-bold py-3.5 rounded-full hover:border-[#0D0C0E] transition-colors text-sm"
-                >
+              {data.marketplace && (
+                <a href={data.marketplace} class="flex items-center justify-center gap-2 border-2 border-gray-200 text-[#0D0C0E] font-bold py-3.5 rounded-full hover:border-[#0D0C0E] transition-colors text-sm">
                   Buy on Marketplace
                 </a>
               )}
@@ -117,32 +117,26 @@ const related = merch.filter(m => m.slug !== slug && m.category === category).sl
           ← Back to Merch
         </a>
       </div>
-
     </div>
 
-    <!-- Related products -->
     {related.length > 0 && (
       <div class="mt-20 pt-12 border-t border-gray-100">
-        <h2 class="text-xl font-black text-[#0D0C0E] mb-6">More {category}</h2>
+        <h2 class="text-xl font-black text-[#0D0C0E] mb-6">More {data.category}</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
           {related.map(r => (
-            <a
-              href={`/merch/${r.slug}`}
-              class="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-            >
+            <a href={`/merch/${r.id.replace(/\.md$/, '')}`} class="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
               <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-4xl border-b border-gray-100">
-                {r.emoji}
+                {r.data.image ? <img src={r.data.image} alt={r.data.name} class="w-full h-full object-cover" /> : r.data.emoji}
               </div>
               <div class="p-4">
-                <h3 class="font-black text-[#0D0C0E] text-sm leading-snug group-hover:text-[#C4A35A] transition-colors mb-1">{r.name}</h3>
-                <div class="font-bold text-[#0D0C0E] text-sm">{fmt(r.price)}</div>
+                <h3 class="font-black text-[#0D0C0E] text-sm leading-snug group-hover:text-[#C4A35A] transition-colors mb-1">{r.data.name}</h3>
+                <div class="font-bold text-[#0D0C0E] text-sm">{fmt(r.data.price)}</div>
               </div>
             </a>
           ))}
         </div>
       </div>
     )}
-
   </div>
 </Layout>
 
@@ -150,12 +144,8 @@ const related = merch.filter(m => m.slug !== slug && m.category === category).sl
   const btns = document.querySelectorAll<HTMLButtonElement>('.size-btn')
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
-      btns.forEach(b => {
-        b.classList.remove('border-[#0D0C0E]', 'bg-[#0D0C0E]', 'text-white')
-        b.classList.add('border-gray-200', 'text-[#6B6475]')
-      })
-      btn.classList.add('border-[#0D0C0E]', 'bg-[#0D0C0E]', 'text-white')
-      btn.classList.remove('border-gray-200', 'text-[#6B6475]')
+      btns.forEach(b => { b.classList.remove('border-[#0D0C0E]','bg-[#0D0C0E]','text-white'); b.classList.add('border-gray-200','text-[#6B6475]') })
+      btn.classList.add('border-[#0D0C0E]','bg-[#0D0C0E]','text-white'); btn.classList.remove('border-gray-200','text-[#6B6475]')
     })
   })
 </script>

@@ -1,11 +1,17 @@
 ---
 import Layout from '../../layouts/Layout.astro'
-import { merch, fmt, type MerchCategory } from '../../data/merch'
+import { getCollection } from 'astro:content'
 
-const categories: MerchCategory[] = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD', 'Vinyl']
+const merchRaw = await getCollection('merch')
+const merch = merchRaw.sort((a, b) => a.data.order - b.data.order)
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+
+const categories = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD', 'Vinyl']
 ---
 
-<Layout title="Merch — VAKHRANDI" description="Official VAKHRANDI merchandise — tees, hoodies, posters, vinyl, and more.">
+<Layout title="Merch — VAKHRANDI" description="Official VAKHRANDI merchandise.">
 
   <section class="py-20 px-6 bg-[#F9F8F6] text-center">
     <p class="text-xs font-bold uppercase tracking-[0.3em] text-[#C4A35A] mb-3">Official Store</p>
@@ -15,60 +21,54 @@ const categories: MerchCategory[] = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD',
 
   <div class="max-w-6xl mx-auto px-6 py-16">
 
-    <!-- Filter -->
     <div class="flex flex-wrap gap-2 mb-10">
-      <button data-filter="all" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-[#0D0C0E] text-white border border-[#0D0C0E] transition-all">
-        All
-      </button>
+      <button data-filter="all" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-[#0D0C0E] text-white border border-[#0D0C0E] transition-all">All</button>
       {categories.map(c => (
-        <button data-filter={c} class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">
-          {c}
-        </button>
+        <button data-filter={c} class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 text-[#6B6475] hover:border-[#0D0C0E] hover:text-[#0D0C0E] transition-all">{c}</button>
       ))}
     </div>
 
-    <!-- Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-      {merch.map(({ slug, name, category, price, sizes, stock, emoji }) => (
-        <a
-          href={`/merch/${slug}`}
-          data-category={category}
-          class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <!-- Product image -->
-          <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-5xl border-b border-gray-100 relative">
-            {emoji}
-            {stock === 'Sold Out' && (
-              <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
-                <span class="text-xs font-black text-[#6B6475] uppercase tracking-widest">Sold Out</span>
-              </div>
-            )}
-            {stock === 'Low Stock' && (
-              <div class="absolute top-2 right-2">
-                <span class="text-[10px] font-bold bg-[#FEF3C7] text-[#D97706] px-2 py-0.5 rounded-full">Low Stock</span>
-              </div>
-            )}
-          </div>
-
-          <div class="p-4">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A]">{category}</span>
-            <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug group-hover:text-[#C4A35A] transition-colors">{name}</h3>
-
-            {sizes && (
-              <div class="flex flex-wrap gap-1 mb-2">
-                {sizes.map(s => (
-                  <span class="text-[10px] text-[#6B6475] border border-gray-200 px-1.5 py-0.5 rounded">{s}</span>
-                ))}
-              </div>
-            )}
-
-            <div class="flex items-center justify-between mt-2">
-              <span class="font-black text-[#0D0C0E] text-sm">{fmt(price)}</span>
-              <span class="text-xs text-[#C4A35A] font-bold">View →</span>
+      {merch.map(({ id, data }) => {
+        const slug = id.replace(/\.md$/, '')
+        return (
+          <a
+            href={`/merch/${slug}`}
+            data-category={data.category}
+            class="merch-item bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+          >
+            <div class="aspect-square bg-[#F9F8F6] flex items-center justify-center text-5xl border-b border-gray-100 relative">
+              {data.image
+                ? <img src={data.image} alt={data.name} class="w-full h-full object-cover" />
+                : data.emoji
+              }
+              {data.stock === 'Sold Out' && (
+                <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
+                  <span class="text-xs font-black text-[#6B6475] uppercase tracking-widest">Sold Out</span>
+                </div>
+              )}
+              {data.stock === 'Low Stock' && (
+                <div class="absolute top-2 right-2">
+                  <span class="text-[10px] font-bold bg-[#FEF3C7] text-[#D97706] px-2 py-0.5 rounded-full">Low Stock</span>
+                </div>
+              )}
             </div>
-          </div>
-        </a>
-      ))}
+            <div class="p-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A]">{data.category}</span>
+              <h3 class="font-black text-[#0D0C0E] text-sm mt-0.5 mb-1 leading-snug group-hover:text-[#C4A35A] transition-colors">{data.name}</h3>
+              {data.sizes && (
+                <div class="flex flex-wrap gap-1 mb-2">
+                  {data.sizes.map(s => <span class="text-[10px] text-[#6B6475] border border-gray-200 px-1.5 py-0.5 rounded">{s}</span>)}
+                </div>
+              )}
+              <div class="flex items-center justify-between mt-2">
+                <span class="font-black text-[#0D0C0E] text-sm">{fmt(data.price)}</span>
+                <span class="text-xs text-[#C4A35A] font-bold">View →</span>
+              </div>
+            </div>
+          </a>
+        )
+      })}
     </div>
 
   </div>
@@ -77,19 +77,12 @@ const categories: MerchCategory[] = ['T-Shirt', 'Hoodie', 'Cap', 'Poster', 'CD',
 <script>
   const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn')
   const items = document.querySelectorAll<HTMLElement>('.merch-item')
-
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter!
-      btns.forEach(b => {
-        b.classList.remove('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]')
-        b.classList.add('border-gray-200', 'text-[#6B6475]')
-      })
-      btn.classList.add('bg-[#0D0C0E]', 'text-white', 'border-[#0D0C0E]')
-      btn.classList.remove('border-gray-200', 'text-[#6B6475]')
-      items.forEach(item => {
-        item.style.display = (filter === 'all' || item.dataset.category === filter) ? '' : 'none'
-      })
+      btns.forEach(b => { b.classList.remove('bg-[#0D0C0E]','text-white','border-[#0D0C0E]'); b.classList.add('border-gray-200','text-[#6B6475]') })
+      btn.classList.add('bg-[#0D0C0E]','text-white','border-[#0D0C0E]'); btn.classList.remove('border-gray-200','text-[#6B6475]')
+      items.forEach(i => { i.style.display = (filter === 'all' || i.dataset.category === filter) ? '' : 'none' })
     })
   })
 </script>

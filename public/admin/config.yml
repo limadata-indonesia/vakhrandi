@@ -1,0 +1,178 @@
+# ─────────────────────────────────────────────────────────────
+# VAKHRANDI CMS — Decap CMS configuration
+#
+# LOCAL DEVELOPMENT:
+#   1. Run `npx decap-server` in one terminal
+#   2. Run `npm run dev` in another
+#   3. Visit http://localhost:4321/admin
+#
+# PRODUCTION (Vercel + GitHub):
+#   Replace the backend block below with:
+#
+#   backend:
+#     name: github
+#     repo: limadata-indonesia/vakhrandi
+#     branch: main
+#     auth_type: pkce
+#     app_id: YOUR_GITHUB_OAUTH_APP_CLIENT_ID
+#
+#   Then create a GitHub OAuth App at:
+#   https://github.com/settings/developers
+#   Callback URL: https://yourdomain.com/admin
+# ─────────────────────────────────────────────────────────────
+
+local_backend: true
+
+backend:
+  name: github
+  repo: limadata-indonesia/vakhrandi
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+
+  # ── Artist Settings ──────────────────────────────────────────
+  - name: settings
+    label: Artist Settings
+    files:
+      - name: artist
+        label: Artist Info
+        file: src/content/settings/artist.json
+        fields:
+          - { name: id, widget: hidden, default: main }
+          - { label: Name, name: name, widget: string }
+          - { label: Tagline, name: tagline, widget: string }
+          - { label: Genre, name: genre, widget: string }
+          - { label: Bio, name: bio, widget: text }
+          - { label: Bio (Extended), name: bioExtended, widget: text, required: false }
+          - label: Milestones
+            name: milestones
+            widget: list
+            fields:
+              - { label: Year, name: year, widget: string }
+              - { label: Event, name: event, widget: string }
+          - label: Influences
+            name: influences
+            widget: list
+            field: { label: Artist, name: influence, widget: string }
+          - label: Achievements
+            name: achievements
+            widget: list
+            field: { label: Achievement, name: achievement, widget: string }
+          - label: Stats
+            name: stats
+            widget: object
+            fields:
+              - { label: Monthly Listeners, name: monthlyListeners, widget: string, default: "—" }
+              - { label: Total Streams, name: totalStreams, widget: string, default: "—" }
+              - { label: Total Releases, name: totalReleases, widget: string, default: "—" }
+          - label: Social Links
+            name: social
+            widget: object
+            fields:
+              - { label: Spotify, name: spotify, widget: string, default: "#" }
+              - { label: Apple Music, name: appleMusic, widget: string, default: "#" }
+              - { label: Instagram, name: instagram, widget: string, default: "#" }
+              - { label: TikTok, name: tiktok, widget: string, default: "#" }
+              - { label: YouTube, name: youtube, widget: string, default: "#" }
+              - { label: Threads, name: threads, widget: string, default: "#" }
+              - { label: X / Twitter, name: twitter, widget: string, default: "#" }
+              - { label: Facebook, name: facebook, widget: string, default: "#" }
+          - { label: Spotify Track ID (latest), name: spotifyTrackId, widget: string, required: false }
+          - { label: Spotify Playlist ID, name: spotifyPlaylistId, widget: string, required: false }
+          - { label: Apple Music ID, name: appleMusicId, widget: string, required: false }
+          - { label: Press / Booking Email, name: pressEmail, widget: string, required: false }
+
+  # ── Releases ─────────────────────────────────────────────────
+  - name: releases
+    label: Releases
+    label_singular: Release
+    folder: src/content/releases
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Type
+        name: type
+        widget: select
+        options: [Single, EP, Album, Collaboration]
+      - { label: Year, name: year, widget: string }
+      - { label: Duration, name: duration, widget: string, hint: "e.g. 3:42 or 18:30" }
+      - { label: Description, name: description, widget: text }
+      - { label: Cover Art, name: cover, widget: image, required: false }
+      - { label: Sort Order, name: order, widget: number, default: 99 }
+      - label: Streaming Links
+        name: links
+        widget: list
+        fields:
+          - { label: Platform, name: platform, widget: string, hint: "Spotify, Apple Music, etc." }
+          - { label: URL, name: url, widget: string }
+
+  # ── Merch ─────────────────────────────────────────────────────
+  - name: merch
+    label: Merchandise
+    label_singular: Merch Item
+    folder: src/content/merch
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Product Name, name: name, widget: string }
+      - label: Category
+        name: category
+        widget: select
+        options: [T-Shirt, Hoodie, Cap, Poster, CD, Vinyl]
+      - { label: Price (IDR), name: price, widget: number }
+      - label: Sizes
+        name: sizes
+        widget: list
+        required: false
+        field: { label: Size, name: size, widget: string }
+      - label: Stock Status
+        name: stock
+        widget: select
+        options: [In Stock, Low Stock, Sold Out]
+      - { label: Description, name: description, widget: text }
+      - label: Product Details
+        name: details
+        widget: list
+        field: { label: Detail, name: detail, widget: string }
+      - { label: Product Image, name: image, widget: image, required: false }
+      - { label: Emoji (fallback), name: emoji, widget: string, default: "📦" }
+      - { label: WhatsApp Link, name: whatsapp, widget: string, required: false }
+      - { label: Marketplace Link, name: marketplace, widget: string, required: false }
+      - { label: Sort Order, name: order, widget: number, default: 99 }
+
+  # ── Videos ───────────────────────────────────────────────────
+  - name: videos
+    label: Videos
+    label_singular: Video
+    folder: src/content/videos
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Category
+        name: category
+        widget: select
+        options: [Music Video, Lyric Video, Shorts, Live Session]
+      - { label: YouTube Video ID, name: youtubeId, widget: string, required: false, hint: "The part after ?v= in the YouTube URL" }
+      - { label: Year, name: year, widget: string }
+      - { label: Sort Order, name: order, widget: number, default: 99 }
+
+  # ── Gallery ──────────────────────────────────────────────────
+  - name: gallery
+    label: Gallery
+    label_singular: Photo
+    folder: src/content/gallery
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Caption / Alt Text, name: alt, widget: string }
+      - label: Category
+        name: category
+        widget: select
+        options: [Photoshoot, Live Performance, Behind The Scene, Studio Session, Fan Event]
+      - { label: Photo, name: src, widget: image, required: false }
+      - { label: Sort Order, name: order, widget: number, default: 99 }

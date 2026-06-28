@@ -1,0 +1,42 @@
+[
+  {
+    "id": "main",
+    "name": "VAKHRANDI",
+    "tagline": "Indie Electronic · Alternative · Ambient",
+    "genre": "Indie Electronic / Alternative / Ambient",
+    "bio": "VAKHRANDI is an independent music artist blending indie electronic, alternative, and ambient soundscapes. With a self-produced approach to music creation, VAKHRANDI crafts immersive sonic experiences that sit between introspection and movement.",
+    "bioExtended": "Drawing from a wide palette of influences — from deep house to post-rock — each release explores new textures and emotional landscapes, building a catalog that grows with every drop.",
+    "influences": ["Bonobo", "Four Tet", "Floating Points", "Jon Hopkins", "Arca"],
+    "achievements": [
+      "Featured on Spotify editorial playlists",
+      "Collaborated with multiple independent artists",
+      "Growing international listener base"
+    ],
+    "milestones": [
+      { "year": "2022", "event": "Started producing music independently." },
+      { "year": "2023", "event": "First release on Spotify and Apple Music." },
+      { "year": "2024", "event": "Collaborated with regional artists." },
+      { "year": "2025", "event": "Reached growing streaming milestones." },
+      { "year": "2026", "event": "Released \"Broken Signals\" — latest single." }
+    ],
+    "stats": {
+      "monthlyListeners": "—",
+      "totalStreams": "—",
+      "totalReleases": "—"
+    },
+    "social": {
+      "spotify": "#",
+      "appleMusic": "#",
+      "instagram": "#",
+      "tiktok": "#",
+      "youtube": "#",
+      "threads": "#",
+      "twitter": "#",
+      "facebook": "#"
+    },
+    "spotifyTrackId": "",
+    "spotifyPlaylistId": "",
+    "appleMusicId": "",
+    "pressEmail": ""
+  }
+]
