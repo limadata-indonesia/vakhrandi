@@ -1,24 +1,22 @@
 # ─────────────────────────────────────────────────────────────
 # VAKHRANDI CMS — Decap CMS configuration
 #
+# SETUP (one-time):
+#   1. Go to https://github.com/settings/developers
+#   2. Click "New OAuth App"
+#      - App name: VAKHRANDI CMS
+#      - Homepage URL: https://your-site.vercel.app
+#      - Callback URL: https://your-site.vercel.app/api/callback
+#   3. Copy Client ID and generate a Client Secret
+#   4. In Vercel → Settings → Environment Variables, add:
+#      - GITHUB_CLIENT_ID   = <your client id>
+#      - GITHUB_CLIENT_SECRET = <your client secret>
+#   5. Redeploy on Vercel
+#
 # LOCAL DEVELOPMENT:
 #   1. Run `npx decap-server` in one terminal
 #   2. Run `npm run dev` in another
 #   3. Visit http://localhost:4321/admin
-#
-# PRODUCTION (Vercel + GitHub):
-#   Replace the backend block below with:
-#
-#   backend:
-#     name: github
-#     repo: limadata-indonesia/vakhrandi
-#     branch: main
-#     auth_type: pkce
-#     app_id: YOUR_GITHUB_OAUTH_APP_CLIENT_ID
-#
-#   Then create a GitHub OAuth App at:
-#   https://github.com/settings/developers
-#   Callback URL: https://yourdomain.com/admin
 # ─────────────────────────────────────────────────────────────
 
 local_backend: true
@@ -27,6 +25,8 @@ backend:
   name: github
   repo: limadata-indonesia/vakhrandi
   branch: main
+  base_url: https://your-site.vercel.app
+  auth_endpoint: /api/auth
 
 media_folder: public/images
 public_folder: /images
