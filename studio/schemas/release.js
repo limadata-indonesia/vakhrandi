@@ -25,7 +25,7 @@ export default defineType({
         type: 'object',
         fields: [
           defineField({ name: 'platform', title: 'Platform', type: 'string', description: 'Spotify, Apple Music, etc.' }),
-          defineField({ name: 'url', title: 'URL', type: 'url' }),
+          defineField({ name: 'url', title: 'URL', type: 'string' }),
         ],
         preview: { select: { title: 'platform', subtitle: 'url' } },
       })],
