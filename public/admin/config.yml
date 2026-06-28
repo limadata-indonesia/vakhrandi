@@ -19,8 +19,6 @@
 #   3. Visit http://localhost:4321/admin
 # ─────────────────────────────────────────────────────────────
 
-local_backend: true
-
 backend:
   name: github
   repo: limadata-indonesia/vakhrandi
