@@ -4,7 +4,7 @@ import { client, urlFor } from '../../lib/sanity'
 
 const { slug } = Astro.params
 const data = await client.fetch(
-  `*[_type == "merch" && slug.current == $slug][0]`,
+  `*[_type == "merch" && slug.current == $slug][0]{ ..., image { asset-> } }`,
   { slug }
 )
 
@@ -12,7 +12,7 @@ const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 
 const related = await client.fetch(
-  `*[_type == "merch" && slug.current != $slug && category == $cat] | order(order asc)[0...3]`,
+  `*[_type == "merch" && slug.current != $slug && category == $cat] | order(order asc)[0...3]{ ..., image { asset-> } }`,
   { slug, cat: data?.category }
 )
 ---

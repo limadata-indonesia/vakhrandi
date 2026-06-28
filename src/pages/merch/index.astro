@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro'
 import { client, urlFor } from '../../lib/sanity'
 
-const merch = await client.fetch(`*[_type == "merch"] | order(order asc)`)
+const merch = await client.fetch(`*[_type == "merch"] | order(order asc){ ..., image { asset-> } }`)
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)

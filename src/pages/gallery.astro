@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { client, urlFor } from '../lib/sanity'
 
-const photos = await client.fetch(`*[_type == "gallery"] | order(order asc)`)
+const photos = await client.fetch(`*[_type == "gallery"] | order(order asc){ ..., src { asset-> } }`)
 const categories = ['Photoshoot', 'Live Performance', 'Behind The Scene', 'Studio Session', 'Fan Event']
 ---
 

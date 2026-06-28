@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { client, urlFor } from '../lib/sanity'
 
-const releases = await client.fetch(`*[_type == "release"] | order(order asc)`)
+const releases = await client.fetch(`*[_type == "release"] | order(order asc){ ..., cover { asset-> } }`)
 const filters = ['Single', 'EP', 'Album', 'Collaboration']
 ---
 

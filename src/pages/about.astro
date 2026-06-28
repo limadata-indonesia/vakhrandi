@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import { client, urlFor } from '../lib/sanity'
 
-const artist = await client.fetch(`*[_type == "artist"][0]`)
+const artist = await client.fetch(`*[_type == "artist"][0]{ ..., photo { asset-> } }`)
 ---
 
 <Layout title={`About — ${artist?.name ?? 'VAKHRANDI'}`} description={artist?.bio ?? ''}>

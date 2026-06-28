@@ -3,8 +3,8 @@ import Layout from '../layouts/Layout.astro'
 import { client, urlFor } from '../lib/sanity'
 
 const [artist, releases] = await Promise.all([
-  client.fetch(`*[_type == "artist"][0]`),
-  client.fetch(`*[_type == "release"] | order(order asc)`),
+  client.fetch(`*[_type == "artist"][0]{ ..., photo { asset-> } }`),
+  client.fetch(`*[_type == "release"] | order(order asc){ ..., cover { asset-> } }`),
 ])
 
 const latest = releases?.[0]
