@@ -5,6 +5,7 @@ export default defineType({
   title: 'Artist Settings',
   type: 'document',
   fields: [
+    defineField({ name: 'photo', title: 'Artist Photo', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'name', title: 'Name', type: 'string' }),
     defineField({ name: 'tagline', title: 'Tagline', type: 'string' }),
     defineField({ name: 'genre', title: 'Genre', type: 'string' }),
